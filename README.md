@@ -1,5 +1,3 @@
-# Implementation_Privacy-preserving-fed-learn-via-secret-sharing-and-multi-key-Homomorphic-Encryption
-
 # CDKS-LSS Privacy-Preserving Federated Learning
 
 **Implementation of:**
@@ -10,7 +8,7 @@
 
 ---
 
-## Educational Implementation
+## ⚠️ Educational Implementation
 
 This is an **academic research prototype** designed for understanding the paper's algorithms.
 It is **NOT** a production cryptographic library.
@@ -43,10 +41,10 @@ among themselves using Shamir's Linear Secret Sharing. The server receives only
 
 ### Key Advantages
 | Feature              | FedAvg | xMK-CKKS | CDKS-LSS |
-|----------------------|--------|----------|----------|
-| Encrypted Updates    | ✗      | ✓       | ✓        |
-| Individual Privacy   | ✗      | ✗       | ✓        |
-| Dropout Tolerance    | ✓*     | ✗       | ✓        |
+|---------------------|--------|----------|----------|
+| Encrypted Updates    | ✗      | ✓        | ✓        |
+| Individual Privacy   | ✗      | ✗        | ✓        |
+| Dropout Tolerance    | ✓*     | ✗        | ✓        |
 
 *FedAvg has no crypto, so dropout is trivial but privacy is absent.
 
@@ -56,41 +54,41 @@ among themselves using Shamir's Linear Secret Sharing. The server receives only
 
 ```
 ┌─────────────────────────────────────────────────────────┐
-│                    CDKS-LSS Protocol                    │
+│                    CDKS-LSS Protocol                     │
 ├─────────────────────────────────────────────────────────┤
-│                                                         │
+│                                                          │
 │   ┌──────────┐  global model   ┌──────────┐             │
 │   │  Server  │ ──────────────► │ Client i │             │
 │   └──────────┘                 └──────────┘             │
-│        ▲                            │                   │
-│        │                      local training            │
-│        │                            │                   │
-│        │                      encrypt update            │
-│        │                    (CDKS.Enc with pk_i)        │
-│        │                            │                   │
-│   ┌────┴─────┐  send c_{i,0}  ┌────▼─────┐              │
-│   │ Aggregate │ ◄──────────── │ compute  │              │
-│   │  Σc_{i,0} │               │   μ_i    │              │
-│   └──────────┘                └──────────┘              │
-│        │                            │                   │
-│        │                    secret-share μ_i            │
-│        │                   (Shamir over R_q)            │
-│        │                            │                   │
-│        │                  exchange shares with          │
-│        │                    other clients               │
-│        │                            │                   │
-│        │                    aggregate shares            │
+│        ▲                            │                    │
+│        │                      local training             │
+│        │                            │                    │
+│        │                      encrypt update             │
+│        │                    (CDKS.Enc with pk_i)         │
+│        │                            │                    │
+│   ┌────┴─────┐  send c_{i,0}  ┌────▼─────┐             │
+│   │ Aggregate │ ◄──────────── │ compute  │             │
+│   │  Σc_{i,0} │               │   μ_i    │             │
+│   └──────────┘                └──────────┘             │
+│        │                            │                    │
+│        │                    secret-share μ_i             │
+│        │                   (Shamir over R_q)             │
+│        │                            │                    │
+│        │                  exchange shares with           │
+│        │                    other clients                │
+│        │                            │                    │
+│        │                    aggregate shares             │
 │        │                     s̃_j = Σ f_i(α_j)           │
-│        │                            │                   │
-│   ┌────┴─────┐  send s̃_j    ┌─────▼────┐                │
-│   │ Lagrange │ ◄──────────── │  Client  │               │
-│   │  interp  │               │   j      │               │
-│   │  → Σμ_i  │               └──────────┘               │
+│        │                            │                    │
+│   ┌────┴─────┐  send s̃_j    ┌─────▼────┐              │
+│   │ Lagrange │ ◄──────────── │  Client  │              │
+│   │  interp  │               │   j      │              │
+│   │  → Σμ_i  │               └──────────┘              │
 │   └──────────┘                                          │
-│        │                                                │
-│   M = c_0 + Σμ_i ≈ Σm_i                                 │
+│        │                                                 │
+│   M = c_0 + Σμ_i ≈ Σm_i                                │
 │   w_G = M / N                                           │
-│                                                         │
+│                                                          │
 └─────────────────────────────────────────────────────────┘
 ```
 
@@ -179,15 +177,15 @@ python experiments/experiment_overhead.py
 
 ## 6. Expected Results
 
-| Experiment    | Expected Output                                   |
-|---------------|---------------------------------------------------|
-| FedAvg        | Accuracy converges to ~80-90%                     |
-| CDKS FL       | Similar accuracy, vulnerability demonstrated      |
-| CDKS-LSS FL   | Similar accuracy, individual privacy protected    |
-| xMK-CKKS      | Similar accuracy, fails with dropout              |
-| Security      | Attack succeeds on CDKS, fails on CDKS-LSS        |
-| Dropout       | CDKS-LSS works with ≥t clients; xMK-CKKS needs all|
-| Overhead      | CDKS-LSS has higher client communication          |
+| Experiment     | Expected Output |
+|---------------|----------------|
+| FedAvg        | Accuracy converges to ~80-90% |
+| CDKS FL       | Similar accuracy, vulnerability demonstrated |
+| CDKS-LSS FL   | Similar accuracy, individual privacy protected |
+| xMK-CKKS      | Similar accuracy, fails with dropout |
+| Security      | Attack succeeds on CDKS, fails on CDKS-LSS |
+| Dropout       | CDKS-LSS works with ≥t clients; xMK-CKKS needs all |
+| Overhead      | CDKS-LSS has higher client↔client communication |
 
 Plots are saved to `results/`.
 
@@ -263,3 +261,32 @@ cdks_lss_ppfl/
 - Specific exceptional sequence construction for non-integer evaluation points
 
 ---
+
+## 9. How to Explain This in a Thesis/Viva
+
+### 1. Why ordinary FL is insufficient
+"In standard FedAvg, clients send raw model updates to the server. Research has shown that gradient inversion attacks can reconstruct training data from these updates."
+
+### 2. Why CDKS was considered
+"CDKS multi-key homomorphic encryption allows each client to encrypt with their own key while enabling the server to aggregate encrypted updates. This is ideal for FL because no trusted third party or shared key is needed."
+
+### 3. What vulnerability CDKS has
+"During partial decryption, each client reveals μ_i = c_{i,1}·s_i to the server. The server also knows c_{i,0}. Computing c_{i,0} + μ_i ≈ m_i recovers the individual plaintext — defeating the purpose of encryption."
+
+### 4. What Shamir LSS contributes
+"Instead of sending μ_i directly, each client creates a random polynomial f_i(X) with f_i(0) = μ_i and distributes evaluations to other clients. The clients aggregate received shares and send only the aggregated values to the server."
+
+### 5. How CDKS-LSS fixes the vulnerability
+"The server receives only aggregated shares s̃_j = Σ f_i(α_j). Using Lagrange interpolation, it can reconstruct F(0) = Σ μ_i, but NOT individual μ_i values. Therefore, the individual-plaintext attack is prevented."
+
+### 6. Why threshold t matters
+"The threshold t determines the minimum number of participants needed. With (t,N)-threshold sharing, any t out of N aggregated shares suffice for reconstruction. This provides both security (needs t colluding parties to break) and fault tolerance."
+
+### 7. Why CDKS-LSS tolerates client dropout
+"In xMK-CKKS, ALL participants must provide partial decryptions. If even one drops out, decryption fails. In CDKS-LSS, the server needs only t aggregated shares. Up to N-t clients can drop out without affecting the protocol."
+
+### 8. What the experimental results demonstrate
+"Our experiments show: (1) CDKS-LSS achieves similar accuracy to FedAvg, (2) the CDKS vulnerability is real and exploitable, (3) CDKS-LSS prevents individual recovery, (4) CDKS-LSS tolerates dropout while xMK-CKKS does not, (5) the privacy comes at the cost of client-to-client communication for share exchange."
+
+### 9. What the implementation does NOT prove
+"This is an educational prototype with toy parameters. It demonstrates the mathematical structure of CDKS-LSS but does not constitute a formal security proof. The paper's security analysis (Section 5) provides the formal treatment under the RLWE hardness assumption."
